@@ -15,16 +15,15 @@ import os
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '1'
 
 def gen_labels():
-    train = './Data/Train'
-    train_generator = ImageDataGenerator(rescale = 1/255)
-
-    train_generator = train_generator.flow_from_directory(train,
-                                                        target_size = (300,300),
-                                                        batch_size = 32,
-                                                        class_mode = 'sparse')
-    labels = (train_generator.class_indices)
-    labels = dict((v,k) for k,v in labels.items())
-
+    # For deployment, load labels directly from Labels.txt
+    try:
+        with open("../Labels.txt") as f:
+            labels_list = [line.strip() for line in f.readlines()]
+        # Return as dict {0: label0, 1: label1, ...}
+        labels = {i: label for i, label in enumerate(labels_list)}
+    except Exception:
+        # fallback hardcoded labels if Labels.txt missing
+        labels = {0: "cardboard", 1: "glass", 2: "metal", 3: "paper", 4: "plastic", 5: "trash"}
     return labels
 
 def preprocess(image):
