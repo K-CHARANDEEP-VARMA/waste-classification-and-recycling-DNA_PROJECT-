@@ -27,10 +27,14 @@ def gen_labels():
     return labels
 
 def preprocess(image):
-    image = np.array(image.resize((300, 300), Image.ANTIALIAS))
-    image = np.array(image, dtype='uint8')
-    image = np.array(image)/255.0
+    try:
+        resample_mode = Image.Resampling.LANCZOS  # Pillow >= 10
+    except AttributeError:
+        resample_mode = Image.ANTIALIAS           # Pillow < 10
 
+    image = np.array(image.resize((300, 300), resample_mode))
+    image = np.array(image, dtype='uint8')
+    image = image / 255.0
     return image
 
 def model_arc():
